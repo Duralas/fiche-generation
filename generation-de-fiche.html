@@ -1,0 +1,145 @@
+<link crossorigin="anonymous" integrity="sha384-Ej0hUpn6wbrOTJtRExp8jvboBagaz+Or6E9zzWT+gHCQuuZQQVZUcbmhXQzSG17s" rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" /><script crossorigin="anonymous" integrity="sha384-VI5+XuguQ/l3kUhh4knz7Hxptx47wpQbVRDnp8v7Vvuhzwn1PEYb/uvtH6KLxv6d" src="https://stackpath.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script><style type="text/css">
+	.container-fluid {
+		margin: 7px auto 15px;
+	}
+	.row {
+		margin-left: 7px;
+		margin-right: 7px;
+	}
+	.row > div + div {
+		margin-top: 7px;
+	}
+	[class^="col-"].center-block {
+		float: none;
+	}
+	.rowHead {
+		background-color: #1A120980;
+		color: #f7E9C9;
+		font-size: 18px;
+		margin: 5px auto;
+		padding: 3px 0;
+		text-align: center;
+	}
+	.row + .row {
+		margin-top: 10px;
+	}
+
+	label {
+		color: #dbcca8;
+	}
+	input,
+	option {
+		color: #C4BFB4;
+	}
+	#generateResult {
+		white-space: pre-line;
+	}
+</style> 
+<div class="bodyline">
+	 
+	<div class="container-fluid">
+		 
+		<div class="row">
+			 
+			<div class="col-md-10 center-block rowHead">
+				 Génération de fiche de participant 
+			</div>
+			 
+			<div class="col-md-8 center-block col-xs-10">
+				 
+				<form method="POST" class="form-horizontal" id="formFiche">
+					 
+					<div class="form-group">
+						 <label for="char1_nom" class="col-md-4 col-xs-4">Nom</label> <input required="" name="char1.nom" class="col-md-8 col-xs-8" id="char1_nom" /> 
+					</div>
+					 
+					<div class="form-group">
+						 <label for="char1_nom" class="col-md-4 col-xs-4">Race</label> <select name="char1.race" class="col-md-8 col-xs-8" id="char1_race"> <option selected="" value="">--- Rien de spécial ---</option> <optgroup label="Races jouables"> <option value="abyssal">Abyssal</option> <option value="djöllfulin">Djöllfulin</option> <option value="elfe">Elfe</option> <option value="géant">Géant</option> <option value="humain">Humain</option> <option value="hybride">Hybride</option> <option value="naga">Naga</option> <option value="nain">Nain</option> <option value="peau-verte">Peau-verte</option> <option value="stryge-blanc">Stryge Blanc</option> <option value="stryge-noir">Stryge Noir</option> <option value="thérianthrope">Thérianthrope</option> <option value="vampire">Vampire</option> </optgroup> <optgroup label="Autres entités"> <option value="boss">Boss</option> <option value="invocation">Invocation</option> <option value="skarnien">Skarnien</option> </optgroup> </select> 
+					</div>
+					 
+					<div class="form-group">
+						 <label for="char1_vitalité" class="col-md-4 col-xs-4">Vitalité</label> <input required="" name="char1.vitalité" min="0" type="number" class="col-md-8 col-xs-8" id="char1_vitalité" /> 
+					</div>
+					 
+					<div class="form-group">
+						 <label for="char1_vitesse" class="col-md-4 col-xs-4">Vitesse</label> <input required="" name="char1.vitesse" type="number" class="col-md-8 col-xs-8" id="char1_vitesse" /> 
+					</div>
+					 
+					<div class="form-group">
+						 <label for="char1_dégâts" class="col-md-4 col-xs-4">Dégâts</label> <input required="" name="char1.dégâts" min="0" type="number" class="col-md-8 col-xs-8" id="char1_dégâts" /> 
+					</div>
+					 
+					<div class="form-group text-center">
+						 
+						<button type="submit" class="btn btn-primary" id="generateFiche">
+							Générer
+						</button>
+						 
+					</div>
+					 
+				</form>
+				 
+			</div>
+			 
+		</div>
+		 
+		<div class="row">
+			 
+			<div class="col-md-10 center-block rowHead">
+				 Résultat 
+			</div>
+			 
+			<div class="col-md-8 center-block col-xs-10">
+				 <dl class="codebox"> <dt></dt> <span class="genmed"></span>Code de la fiche  <dd class="code"> </dd></dl>
+				<div style="" class="cont_code" id="generateResult">
+				</div><dl class="codebox"><dd class="code"> </dd> </dl> 
+			</div>
+			 
+		</div>
+		 
+	</div>
+	 
+</div>
+ <script type="text/javascript">
+	(function (ficheGeneration) {
+		ficheGeneration(window.jQuery);
+	} (function ($) {
+		$(function () {
+			var $result = $("#generateResult");
+			var $form = $("#formFiche");
+			$form.on("submit", function (e) {
+				e.preventDefault();
+
+				var formData = $form.serializeArray();
+				var characterData = serializeFormIntoCharacters($form);
+
+				var resultContent = "";
+				for (var char in characterData) {
+					var character = characterData[char];
+					var race = character["race"] !== "" ? " " + character["race"] : "";
+					resultContent += 
+						"<strong class=\"bestiaire-nom" + race + "\">" + character["nom"] + "</strong> : <strong class=\"vitalité\">" + character["vitalité"] + "</strong>\n" +
+						"<span class=\"bestiaire-champ\">Vitesse</span> : <strong class=\"vitesse\">" + character["vitesse"] + "</strong>\n" +
+						"<span class=\"bestiaire-champ\">Dégâts</span> : <strong class=\"dégâts\">" + character["dégâts"] + "</strong>\n"
+					;
+				};
+				$result.text(resultContent);
+			});
+		});
+
+		function serializeFormIntoCharacters($form) {
+			var serializedForm = $form.serializeArray();
+			var serializedCharacters = {};
+			for (var serializedField of serializedForm) {
+				var fieldData = serializedField.name.split(".");
+				var character = fieldData.shift();
+				var fieldName  = fieldData.shift();
+				if (!serializedCharacters.hasOwnProperty(character)) {
+					serializedCharacters[character] = {};
+				}
+				serializedCharacters[character][fieldName] = serializedField.value;
+			}
+			return serializedCharacters;
+		}
+	}));
+</script>
